@@ -13,6 +13,7 @@ import java.io.File;
 import java.nio.file.Path;
 import java.time.ZonedDateTime;
 import java.util.*;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.broadinstitute.barclay.argparser.Argument;
 import org.broadinstitute.barclay.argparser.ArgumentCollection;
@@ -22,10 +23,7 @@ import org.broadinstitute.hellbender.cmdline.GATKPlugin.GATKAnnotationPluginDesc
 import org.broadinstitute.hellbender.cmdline.GATKPlugin.GATKReadFilterPluginDescriptor;
 import org.broadinstitute.hellbender.cmdline.StandardArgumentDefinitions;
 import org.broadinstitute.hellbender.cmdline.argumentcollections.*;
-import org.broadinstitute.hellbender.engine.filters.CountingReadFilter;
-import org.broadinstitute.hellbender.engine.filters.ReadFilter;
-import org.broadinstitute.hellbender.engine.filters.ReadFilterLibrary;
-import org.broadinstitute.hellbender.engine.filters.WellformedReadFilter;
+import org.broadinstitute.hellbender.engine.filters.*;
 import org.broadinstitute.hellbender.exceptions.GATKException;
 import org.broadinstitute.hellbender.exceptions.UserException;
 import org.broadinstitute.hellbender.tools.genomicsdb.GenomicsDBOptions;
@@ -455,8 +453,23 @@ public abstract class GATKTool extends CommandLineProgram {
                 factory = factory.enable(SamReaderFactory.Option.CACHE_FILE_BASED_INDEXES);
             }
 
-            reads = new ReadsPathDataSource(readArguments.getReadPaths(), readArguments.getReadIndexPaths(), factory, cloudPrefetchBuffer,
-                (cloudIndexPrefetchBuffer < 0 ? cloudPrefetchBuffer : cloudIndexPrefetchBuffer));
+            final Map<String, List<GATKPathSpecifier>> pathsByScheme =
+                readArguments.getReadPathSpecifiers()
+                    .stream()
+                    .collect(Collectors.groupingBy(GATKPathSpecifier::getScheme));
+
+            final List<GATKPathSpecifier> htsgetReads = pathsByScheme.get(GATKPathSpecifier.HTSGET_SCHEME);
+            if (htsgetReads != null) {
+                reads = new ReadsHtsgetDataSource(htsgetReads);
+            } else {
+                reads = new ReadsPathDataSource(
+                    readArguments.getReadPaths(),
+                    readArguments.getReadIndexPaths(),
+                    factory,
+                    cloudPrefetchBuffer,
+                    (cloudIndexPrefetchBuffer < 0 ? cloudPrefetchBuffer : cloudIndexPrefetchBuffer));
+            }
+
         }
         else {
             reads = null;

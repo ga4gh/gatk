@@ -26,6 +26,7 @@ public class GATKPathSpecifier extends PathSpecifier implements TaggedArgument, 
     private static final long serialVersionUID = 1L;
 
     public static final String HDFS_SCHEME = "hdfs";
+    public static final String HTSGET_SCHEME = "htsget";
 
     private String tagName;
     private Map<String, String> tagAttributes;
@@ -117,6 +118,10 @@ public class GATKPathSpecifier extends PathSpecifier implements TaggedArgument, 
      */
     public boolean isHadoopURL() {
         return getScheme().equals(HDFS_SCHEME);
+    }
+
+    public boolean isHtsgetURL() {
+        return getScheme().equals(HTSGET_SCHEME);
     }
 
     @Override
