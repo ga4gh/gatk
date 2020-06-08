@@ -46,7 +46,7 @@ public class ReadsHtsgetDataSource implements ReadsDataSource {
             .map(s -> {
                 try {
                     final URI sourceURI = s.getURI();
-                    final HtsgetRequestBuilder req = new HtsgetRequestBuilder(new URI("//" + sourceURI.getHost()), sourceURI.getPath());
+                    final HtsgetRequestBuilder req = new HtsgetRequestBuilder(new URI(sourceURI.getHost()), sourceURI.getPath());
                     final Path outputPath = IOUtils.createTempPath("htsget-temp", s.getExtension().orElse(""));
                     try (final OutputStream ostream = Files.newOutputStream(outputPath)) {
                         org.apache.commons.io.IOUtils.copy(this.client.execute(req), ostream);

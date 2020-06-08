@@ -187,7 +187,7 @@ public class HtsgetRequestBuilder {
      */
     public URI toURI() {
         this.validateRequest();
-        final UriBuilder builder = UriBuilder.fromUri(this.endpoint)
+        final UriBuilder builder = UriBuilder.fromUri("//" + this.endpoint.toString())
             .scheme("https")
             .path(this.id);
 

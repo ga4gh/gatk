@@ -460,7 +460,7 @@ public abstract class GATKTool extends CommandLineProgram {
 
             final List<GATKPathSpecifier> htsgetReads = pathsByScheme.get(GATKPathSpecifier.HTSGET_SCHEME);
             if (htsgetReads != null) {
-                reads = new ReadsHtsgetDataSource(htsgetReads);
+                reads = new ReadsHtsgetDataSource(htsgetReads, factory);
             } else {
                 reads = new ReadsPathDataSource(
                     readArguments.getReadPaths(),
